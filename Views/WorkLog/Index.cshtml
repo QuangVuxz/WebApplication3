@@ -9,6 +9,16 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<form asp-action="Search" method="get">
+    <div class="form-group">
+        <label for="searchString" class="control-label">Search by Title</label>
+        <input type="text" id="searchString" name="searchString" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 <table class="table">
     <thead>
         <tr>

@@ -38,8 +38,8 @@ namespace WebApplication3.Controllers
             return Problem("Unable to retrieve user information from cookies");
         }
 
-        // GET: WorkLog/Details/5
-        public async Task<IActionResult> Details(int? id)
+            // GET: WorkLog/Details/5
+            public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.WorkLogModel == null)
             {

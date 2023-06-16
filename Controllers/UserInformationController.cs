@@ -27,6 +27,21 @@ namespace WebApplication3.Controllers
                           View(await _context.UserInformationModel.ToListAsync()) :
                           Problem("Entity set 'WebApplication3Context.UserInformationModel'  is null.");
         }
+        // GET: UserInformation/Search
+        public async Task<IActionResult> Search(string searchString)
+        {
+            var users = await _context.UserInformationModel.ToListAsync();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u =>
+                    u.Username.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            return View("Index", users);
+        }
+
+
 
         // GET: UserInformation/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -114,7 +129,7 @@ namespace WebApplication3.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             return View(userInformationModel);
         }
@@ -213,14 +228,16 @@ namespace WebApplication3.Controllers
                 {
                     if (user.Role == "Admin")
                     {
-                        Response.Cookies.Append("Username", username);
+                        
                         Response.Cookies.Append("UserId", user.Id.ToString());
+                        
                         return RedirectToAction(nameof(Index), new { id = user.Id });
                     }
                     else if (user.Role == "User")
                     {
-                        Response.Cookies.Append("Username", username);
+                        
                         Response.Cookies.Append("UserId", user.Id.ToString());
+                        
                         return RedirectToAction("Create", "WorkLog", new {id= user.Id});
                     }
                 }
@@ -234,7 +251,8 @@ namespace WebApplication3.Controllers
             return View("Login", username);
         }
 
-        
+        //GetUsername
+
         private bool UserInformationModelExists(int id)
         {
           return (_context.UserInformationModel?.Any(e => e.Id == id)).GetValueOrDefault();
