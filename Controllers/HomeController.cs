@@ -23,6 +23,13 @@ namespace WebApplication3.Controllers
 			return View();
 		}
 
+		public IActionResult LogOut() 
+		{
+			Response.Cookies.Delete("Username");
+			Response.Cookies.Delete("UserId");
+            return RedirectToAction(nameof(Index));
+		}
+
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
 		{
