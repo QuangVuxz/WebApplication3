@@ -234,8 +234,7 @@ namespace WebApplication3.Controllers
             return View("Login", username);
         }
 
-
-
+        
         private bool UserInformationModelExists(int id)
         {
           return (_context.UserInformationModel?.Any(e => e.Id == id)).GetValueOrDefault();

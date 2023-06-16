@@ -9,6 +9,13 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<form asp-controller="UserInformationController" asp-action="Search" method="get">
+    <p>
+        Title: <input type="text" name="searchString" value="@ViewBag.SearchString" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
