@@ -20,12 +20,51 @@ namespace WebApplication3.Controllers
             _context = context;
         }
 
+        //Authorization that can not access to admin if role = user
         // GET: UserInformation
         public async Task<IActionResult> Index()
         {
-              return _context.UserInformationModel != null ? 
-                          View(await _context.UserInformationModel.ToListAsync()) :
-                          Problem("Entity set 'WebApplication3Context.UserInformationModel'  is null.");
+            int? userId = GetUserIdFromCookies();
+            
+            if (userId.HasValue)
+            {
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+                
+                if (userInformation != null)
+                {
+                    string userName = userInformation.Username;
+                    ViewBag.UserName = userName;
+                    
+                    string userRole = userInformation.Role;
+                    
+                    if(userRole == "Admin")
+                    {
+                        return _context.UserInformationModel != null ?
+                         View(await _context.UserInformationModel.ToListAsync()) :
+                         Problem("Entity set 'WebApplication3Context.UserInformationModel'  is null.");
+                    }else if(userRole == "User")
+                    {
+                        var users = await _context.UserInformationModel.Where(u => u.Id == userId).ToListAsync();
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            }
+            return Problem("User Information not found!");
+             
+        }
+
+
+        private int? GetUserIdFromCookies()
+        {
+            if (Request.Cookies.TryGetValue("UserId", out string userIdString))
+            {
+                if (int.TryParse(userIdString, out int userId))
+                {
+                    return userId;
+                }
+            }
+
+            return null;
         }
         // GET: UserInformation/Search
         public async Task<IActionResult> Search(string searchString)
@@ -97,6 +136,7 @@ namespace WebApplication3.Controllers
                 return NotFound();
             }
             return View(userInformationModel);
+            
         }
 
         // POST: UserInformation/Edit/5
@@ -111,26 +151,32 @@ namespace WebApplication3.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            bool usernameExists = await _context.UserInformationModel.AnyAsync(u => u.Username == userInformationModel.Username);
+
+            if (usernameExists)
             {
-                try
-                {
-                    _context.Update(userInformationModel);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserInformationModelExists(userInformationModel.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                
+                ModelState.AddModelError("Username", "Username already exists");
+                return View(userInformationModel);
             }
+            try
+            {
+                _context.Update(userInformationModel);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserInformationModelExists(userInformationModel.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        
+            
             return View(userInformationModel);
         }
 
@@ -231,11 +277,12 @@ namespace WebApplication3.Controllers
                         
                         Response.Cookies.Append("UserId", user.Id.ToString());
                         
+
                         return RedirectToAction(nameof(Index), new { id = user.Id });
                     }
                     else if (user.Role == "User")
                     {
-                        
+                           
                         Response.Cookies.Append("UserId", user.Id.ToString());
                         
                         return RedirectToAction("Create", "WorkLog", new {id= user.Id});
@@ -243,15 +290,17 @@ namespace WebApplication3.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Invalid username or password");
+                    return Content(@"<script language='javascript' type='text/javascript'>
+                         alert('Please try again');
+                         
+                         </script>
+                      ");
                 }
             }
 
             // If the ModelState is invalid or the login failed, return to the login view with the provided username
             return View("Login", username);
         }
-
-        //GetUsername
 
         private bool UserInformationModelExists(int id)
         {

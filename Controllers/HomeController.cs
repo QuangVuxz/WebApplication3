@@ -25,9 +25,8 @@ namespace WebApplication3.Controllers
 
 		public IActionResult LogOut() 
 		{
-			Response.Cookies.Delete("Username");
 			Response.Cookies.Delete("UserId");
-            Response.Cookies.Delete("Role");
+
             return RedirectToAction(nameof(Index));
 		}
 

@@ -22,24 +22,39 @@ namespace WebApplication3.Controllers
         // GET: WorkLog
         public async Task<IActionResult> Index()
         {
-            int? userId = HttpContext.Request.Cookies["UserId"] != null ? int.Parse(HttpContext.Request.Cookies["UserId"]) : (int?)null;
+            int? userId = GetUserIdFromCookies();
 
             if (userId.HasValue)
             {
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+
                 var user = await _context.UserInformationModel.FindAsync(userId.Value);
-                if(user != null)
+                if (user != null)
                 {
                     ViewBag.UserName = user.Username;
 
-                    var workLogs = await _context.WorkLogModel.Where(w=> w.UserId == userId).ToListAsync();
+                    var workLogs = await _context.WorkLogModel.Where(w => w.UserId == userId).ToListAsync();
                     return View(workLogs);
                 }
             }
-            return Problem("Unable to retrieve user information from cookies");
+            return Problem("User Information not found!");
+
+        }
+        private int? GetUserIdFromCookies()
+        {
+            if (Request.Cookies.TryGetValue("UserId", out string userIdString))
+            {
+                if (int.TryParse(userIdString, out int userId))
+                {
+                    return userId;
+                }
+            }
+
+            return null;
         }
 
-            // GET: WorkLog/Details/5
-            public async Task<IActionResult> Details(int? id)
+        // GET: WorkLog/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.WorkLogModel == null)
             {
