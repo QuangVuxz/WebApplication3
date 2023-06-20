@@ -26,6 +26,8 @@ namespace WebApplication3.Controllers
 
             if (userId.HasValue)
             {
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
                 var userInformation = await _context.UserInformationModel.FindAsync(userId);
 
                 var user = await _context.UserInformationModel.FindAsync(userId.Value);

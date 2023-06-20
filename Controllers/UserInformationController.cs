@@ -29,15 +29,17 @@ namespace WebApplication3.Controllers
             if (userId.HasValue)
             {
                 var userInformation = await _context.UserInformationModel.FindAsync(userId);
-                
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
                 if (userInformation != null)
                 {
                     string userName = userInformation.Username;
                     ViewBag.UserName = userName;
                     
                     string userRole = userInformation.Role;
-                    
-                    if(userRole == "Admin")
+                  
+
+                    if (userRole == "Admin")
                     {
                         return _context.UserInformationModel != null ?
                          View(await _context.UserInformationModel.ToListAsync()) :
