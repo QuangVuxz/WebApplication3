@@ -87,7 +87,21 @@ namespace WebApplication3.Controllers
         // GET: UserInformation/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.UserInformationModel == null)
+            int? userId = GetUserIdFromCookies();
+
+            if (userId.HasValue)
+            {
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
+                if (userInformation != null)
+                {
+                    string userName = userInformation.Username;
+                    ViewBag.UserName = userName;
+                }
+            }
+
+                    if (id == null || _context.UserInformationModel == null)
             {
                 return NotFound();
             }
@@ -105,6 +119,7 @@ namespace WebApplication3.Controllers
         // GET: UserInformation/Create
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -115,6 +130,19 @@ namespace WebApplication3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Username,Password,Role")] UserInformationModel userInformationModel)
         {
+            int? userId = GetUserIdFromCookies();
+
+            if (userId.HasValue)
+            {
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
+                if (userInformation != null)
+                {
+                    string userName = userInformation.Username;
+                    ViewBag.UserName = userName;
+                }
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(userInformationModel);
@@ -127,7 +155,20 @@ namespace WebApplication3.Controllers
         // GET: UserInformation/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.UserInformationModel == null)
+            int? userId = GetUserIdFromCookies();
+
+            if (userId.HasValue)
+            {
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
+                if (userInformation != null)
+                {
+                    string userName = userInformation.Username;
+                    ViewBag.UserName = userName;
+                }
+            }
+                    if (id == null || _context.UserInformationModel == null)
             {
                 return NotFound();
             }

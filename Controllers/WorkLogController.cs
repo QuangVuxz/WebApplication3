@@ -58,7 +58,21 @@ namespace WebApplication3.Controllers
         // GET: WorkLog/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.WorkLogModel == null)
+            int? userId = GetUserIdFromCookies();
+
+            if (userId.HasValue)
+            {
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+
+                var user = await _context.UserInformationModel.FindAsync(userId.Value);
+                if (user != null)
+                {
+                    ViewBag.UserName = user.Username;
+                }
+            }
+                    if (id == null || _context.WorkLogModel == null)
             {
                 return NotFound();
             }
@@ -98,6 +112,20 @@ namespace WebApplication3.Controllers
         // GET: WorkLog/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            int? userId = GetUserIdFromCookies();
+
+            if (userId.HasValue)
+            {
+                bool checkUserLogged = true;
+                ViewBag.CheckUserLogged = checkUserLogged;
+                var userInformation = await _context.UserInformationModel.FindAsync(userId);
+
+                var user = await _context.UserInformationModel.FindAsync(userId.Value);
+                if (user != null)
+                {
+                    ViewBag.UserName = user.Username;
+                }
+            }
             if (id == null || _context.WorkLogModel == null)
             {
                 return NotFound();
